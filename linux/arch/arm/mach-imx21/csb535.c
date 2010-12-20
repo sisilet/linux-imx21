@@ -142,13 +142,18 @@ static struct imxfb_mach_info csb535_fb_info __initdata = {
 	.pixclock	= 0, 		.bpp		= 16,
 	.xres		= 240,		.yres		= 320,
 
-	.hsync_len	= 1,		.vsync_len	= 1,
-	.left_margin	= 15,		.upper_margin	= 9,
-	.right_margin	= 6,		.lower_margin	= 7,
+	.hsync_len	= 0x3e,		.vsync_len	= 1,
+	.left_margin	= 0x12,		.upper_margin	= 0,
+	.right_margin	= 0x39,		.lower_margin	= 3,
 
-	.lpcr	= LPCR_TFT | LPCR_COLOR | LPCR_PBSIZ(LPCR_PBSIZ_PANEL_BUS_WIDTH_8) | LPCR_BPIX(LPCR_BPIX_BITS_PER_PIXEL_16) | LPCR_PIXPOL | LPCR_OEPOL | LPCR_SCLKSEL | LPCR_SHARP | LPCR_PCD(7),
+//	.lpcr	= LPCR_TFT | LPCR_COLOR | LPCR_PBSIZ(LPCR_PBSIZ_PANEL_BUS_WIDTH_8) | LPCR_BPIX(LPCR_BPIX_BITS_PER_PIXEL_16) | LPCR_PIXPOL | LPCR_OEPOL | LPCR_SCLKSEL | LPCR_SHARP | LPCR_PCD(7),
+
+	.lpcr   = LPCR_TFT | LPCR_COLOR | LPCR_PBSIZ(LPCR_PBSIZ_PANEL_BUS_WIDTH_8) | LPCR_BPIX(LPCR_BPIX_BITS_PER_PIXEL_16) | LPCR_FLMPOL | LPCR_LPPOL | LPCR_CLKPOL | LPCR_SCLKSEL | LPCR_PCD(7),
+ 
 	.lpccr	= LPCCR_CLS_HI_WIDTH(169) | LPCCR_SCR(LPCCR_SCR_PIXEL_CLOCK) | LPCCR_CC_EN | LPCCR_PW(0xff),
 	.lscr	= LSCR_PS_RISE_DELAY(0) | LSCR_CLS_RISE_DELAY(18) | LSCR_REV_TOGGLE_DELAY(3) | LSCR_GRAY2(0) | LSCR_GRAY1(0), 
+//	.lscr	= LSCR_PS_RISE_DELAY(16) | LSCR_CLS_RISE_DELAY(12) | LSCR_REV_TOGGLE_DELAY(3) | LSCR_GRAY2(7) | LSCR_GRAY1(3), 
+
 
 	.lcd_power = csb535_lcd_power,
 };

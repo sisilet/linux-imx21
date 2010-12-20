@@ -363,7 +363,7 @@ static int imxfb_activate_var(struct fb_var_screeninfo *var, struct fb_info *inf
 	                  LVCR_V_WAIT_1(var->upper_margin) |
 			  LVCR_V_WAIT_2(var->lower_margin);
 
-	LCDC_LSR	= LSR_XMAX(var->xres) | LSR_YMAX(var->yres);
+	LCDC_LSR	= LSR_XMAX(var->xres/16) | LSR_YMAX(var->yres);
 	LCDC_LPCR	= fbi->lpcr;
 	LCDC_LPCCR	= fbi->lpccr;
 	LCDC_LSCR	= fbi->lscr;
