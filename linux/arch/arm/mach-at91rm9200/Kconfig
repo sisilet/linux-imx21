@@ -1,0 +1,50 @@
+if ARCH_AT91RM9200
+
+menu "AT91RM9200 Implementations"
+
+config ARCH_AT91RM9200DK
+	bool "Atmel AT91RM9200-DK Development board"
+	depends on ARCH_AT91RM9200
+	help
+	  Select this if you are using Atmel's AT91RM9200-DK Development board
+
+config MACH_AT91RM9200EK
+	bool "Atmel AT91RM9200-EK Evaluation Kit"
+	depends on ARCH_AT91RM9200
+	help
+	  Select this if you are using Atmel's AT91RM9200-EK Evaluation Kit
+
+config MACH_CSB337
+	bool "Cogent CSB337 board"
+	depends on ARCH_AT91RM9200
+	help
+	  Select this if you are using Cogent's CSB337 board
+
+config MACH_CSB437TL
+	bool "Cogent CSB437TL board"
+	depends on ARCH_AT91RM9200
+	help
+	  Select this if you are using Cogent's CSB437TL board
+
+config MACH_CSB437TL_REV
+        int "  Hardware revision number (2, 4 tested)"
+        depends on MACH_CSB437TL
+        help
+          Specify which hardware revision number you are using,
+          i.e. "2", "4", etc.
+
+config MACH_CSB637
+	bool "Cogent CSB637 board"
+	depends on ARCH_AT91RM9200
+	help
+	  Select this if you are using Cogent's CSB637 board
+
+config MACH_CARMEVA
+	bool "Conitec's ARM&EVA"
+	depends on ARCH_AT91RM9200
+	help
+	  Select this if you are using Conitec's AT91RM9200-MCU-Module
+
+endmenu
+
+endif

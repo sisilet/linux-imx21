@@ -1,0 +1,48 @@
+menu "ALSA ARM devices"
+	depends on SND!=n && ARM
+
+config SND_PXA2XX_AC97
+	tristate "AC97 driver for the Intel PXA2xx chip"
+	depends on ARCH_PXA && SND
+	select SND_PXA2XX_PCM
+	select SND_AC97_CODEC
+	help
+	  Say Y or M if you want to support any AC97 codec attached to
+	  the PXA2xx AC97 interface.
+
+config SND_PXA2XX_PCM
+	tristate
+	select SND_PCM
+	help
+	  Generic PCM module for PXA2xx
+
+config SND_S3C2410
+	tristate "S3C24XX Sound core"
+	depends on ARCH_S3C2410 && SND
+	select I2C_SENSOR
+	select SND_PCM
+	help
+	  Say Y here if you want to use the inbuilt audio controller
+	  on the S3C2410 or S3C2440
+
+config SND_CSB536FS
+	tristate "CSB536FS audio driver"
+	depends on MACH_CSB536FS && SND
+	select I2C
+	select I2C_IMX
+	select WM8731
+	select SND_PCM
+	help
+	  ALSA Sound driver for the CSB536FS
+
+config SND_CSB536PC
+	tristate "CSB536PC audio driver"
+	depends on MACH_CSB536_PC && SND
+	select I2C_IMX
+	select WM8731
+	select SND_PCM
+	help
+	  ALSA Sound driver for the CSB536PC
+
+endmenu
+

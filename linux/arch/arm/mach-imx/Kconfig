@@ -1,0 +1,74 @@
+menu "IMX Implementations"
+	depends on FAMILY_IMX
+
+choice
+	prompt "Select IMX-based board"
+	default ARCH_MX1ADS
+
+config ARCH_MX1ADS
+	bool "mx1ads"
+	depends on FAMILY_IMX
+	select ARCH_IMX
+	select ISA
+	help
+	  Say Y here if you are using the Motorola MX1ADS board
+
+config MACH_CSB535
+	bool "CSB535"
+	depends on FAMILY_IMX
+	select ARCH_IMX21
+	help
+	  Say Y here if you are using the Cogent CSB535 board.
+ 
+config MACH_CSB536
+	bool "Cogent CSB536 board"
+	depends on ARCH_IMX
+	help
+	  Say Y here if you are using the Cogent CSB536 board.
+
+config ARCH_MX2ADS
+	bool "mx2ads"
+	depends on FAMILY_IMX
+	select ARCH_IMX21
+	default y if FAMILY_IMX
+	help
+	  Say Y here if you are using the Freescale MX21ADS board
+ 
+endchoice
+
+choice
+	prompt "Select CSB536 variant"
+	depends on MACH_CSB536
+	default MACH_CSB536FS
+
+config MACH_CSB536FS
+	bool "Cogent CSB536FS board"
+	depends on MACH_CSB536
+	help
+	  Say Y here if you are using the Cogent CSB536FS board.
+
+config MACH_CSB536PC
+	bool "Cogent CSB536PC board"
+	depends on MACH_CSB536
+	help
+	  Say Y here if you are using the Cogent CSB536PC board.
+
+
+endchoice
+
+config UMON_SHIM
+	bool "Shim uMON's call command"
+	depends on MACH_CSB536 || MACH_CSB535
+	default n
+	help
+		Select Y to add an assembly language "shim" to the bootloader
+		that maps the parameters as they are passed by older versions
+		of uMON to the ATAGS parameter passing convention supported by
+		the latest arm-linux kernels.  If in doubt, select yes.
+
+endmenu
+
+config ARCH_IMX
+	bool
+config ARCH_IMX21
+	bool
