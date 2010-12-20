@@ -40,6 +40,7 @@ obj-$(CONFIG_I2C_VIA)		+= i2c-via.o
 obj-$(CONFIG_I2C_VIAPRO)	+= i2c-viapro.o
 obj-$(CONFIG_I2C_VOODOO3)	+= i2c-voodoo3.o
 obj-$(CONFIG_I2C_IMX)		+= i2c-imx.o
+obj-$(CONFIG_I2C_IMX21)		+= i2c-imx21.o
 obj-$(CONFIG_SCx200_ACB)	+= scx200_acb.o
 obj-$(CONFIG_SCx200_I2C)	+= scx200_i2c.o
 obj-$(CONFIG_I2C_AT91)		+= at91_i2c.o
