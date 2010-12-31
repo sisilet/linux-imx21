@@ -17,6 +17,8 @@
  * 100% relocatable.  Any attempt to do so will result in a crash.
  * Please select one of the following when turning on debugging.
  */
+#define DEBUG
+
 #ifdef DEBUG
 
 #include <asm/arch/debug-macro.S>
@@ -40,7 +42,8 @@
     defined(CONFIG_ARCH_IXP2000) || \
     defined(CONFIG_ARCH_LH7A40X) || \
     defined(CONFIG_ARCH_OMAP) || \
-    defined(CONFIG_ARCH_AT91RM9200)
+    defined(CONFIG_ARCH_AT91RM9200) || \
+    defined(CONFIG_ARCH_IMX21)
 		.macro	loadsp,	rb
 		addruart \rb
 		.endm
@@ -138,6 +141,16 @@ start:
 #if defined (CONFIG_UMON_SHIM)
 		mov	r10, r0			@ save the uMON command line
 #endif
+
+		kputc	#'e'
+		kputc	#'r'
+		kputc	#'i'
+		kputc	#'c'
+		kputc	#'f'
+		kputc	#'u'
+		kputc	#'n'
+		kputc	#'g'
+		kputc	#'\n'
 
 #ifndef __ARM_ARCH_2__
 		/*

@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <fcntl.h>
 #include <linux/i2c-dev.h>
+#include <unistd.h>
  
 #define I2C_SLAVE 0x0703
 
@@ -50,10 +51,22 @@ int main()
 		exit(1);
 	}
 
-//	setreg(file, 0,0xaa);
 	setreg(file, 3,0xF0);
 	setreg(file, 2,0x00);
-	setreg(file, 1,0x08);
+
+	int i;
+	__u8 val = 1;
+	while(1)
+	{
+		setreg(file, 1,(~val)&0xFF);
+		sleep(1);
+		val<<=1;
+		if(val==0x10)
+			val = 1;
+		int k = getreg(file,0);
+		if((k&0x10) == 0)
+			break;
+	}
 
 
 	printf("reg%d=0x%x\n", 0, getreg(file, 0));	

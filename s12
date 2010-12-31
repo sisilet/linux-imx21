@@ -1,0 +1,194 @@
+###############################################################################
+# GX-Linux Startup Script for both ROMFS and NFS Server Filesystem mounts
+###############################################################################
+# (c)2005 Microcross, Inc.
+# Last update: 20051026
+###############################################################################
+#
+#
+# Files/Target defined in TFS (Tiny FileSystem)
+set TARGET flash00
+set ROOTDIR romfs.img
+set KERNEL zImage-2.6.12
+set NFSENABLE 0
+set NFSIP 10.0.0.1
+set NFS_PATH /home/eric/dev/gxlinux/rootfs
+set ARCH_ID 0x353
+
+#
+# DHCPWAIT:
+echo sleep 1...
+sleep 1
+if $IPADD seq DHCP goto DHCPWAIT
+if $IPADD seq DHCPV goto DHCPWAIT
+if $IPADD seq DHCPv goto DHCPWAIT
+echo IP Address OK, $IPADD
+#
+# TODO: set this variable 
+# Set if you are going to use a TFTP server
+set TFTPSERVER 10.0.0.1
+###############################################################################
+#
+#
+#
+# check for filesystem image in flash
+tfs base $ROOTDIR ROOTDIR_BASE
+tfs size $ROOTDIR ROOTDIR_SIZE
+set ROOTDIR_OFFSET=$ROOTDIR_BASE-0xc8000000
+
+#
+# Verify that a seemingly-useful filesystem
+# image is present; abort if it isn't
+# (delete these two tests if you are using NFS exclusively)
+#if $ROOTDIR_BASE seq \$ROOTDIR_BASE goto NO_FILE
+#if $ROOTDIR_SIZE seq \$ROOTDIR_SIZE goto NO_FILE
+#
+# ok, we found what looks like a filesystem in flash,
+# (based only on the name of the file)
+# do some math to figure out where it is
+#set ROOTDIR_BASE=$ROOTDIR_BASE-$BOOTROMBASE
+#echo $ROOTDIR: size=$ROOTDIR_SIZE base=$ROOTDIR_BASE
+#
+# Check for a kernel
+tfs base $KERNEL KERNEL_BASE
+tfs size $KERNEL KERNEL_SIZE
+#
+if $KERNEL_BASE seq \$KERNEL_BASE goto GET_KERNEL
+if $KERNEL_SIZE seq \$KERNEL_SIZE goto GET_KERNEL
+#
+# Found a kernel, load it into RAM
+tfs cp $KERNEL $APPRAMBASE
+#tfs cp $KERNEL 0xc0800000
+echo $KERNEL: size=$KERNEL_SIZE base=$APPRAMBASE
+#echo $KERNEL: size=$KERNEL_SIZE base=0xc0800000
+#
+# GOT_KERNEL:
+#
+# allocate memory for the kernel command line
+# (as a side effect, this command sets $MALLOC)
+heap -m 1024
+#
+###############################################################################
+#
+if $NFSENABLE seq 1 goto BOOTNFS
+if $ARG1 seq "nfs" goto BOOTNFS
+#
+###############################################################################
+#
+# (note: -s creates a new string; -S appends to an existing string)
+# (note: the trailing spaces are so that appends work as expected)
+#
+pm -s $MALLOC "mem=32M console=ttySMX0,38400 "
+pm -S $MALLOC "ip=$IPADD:$NFSSERVER:$GIPADD:$NETMASK::eth0:off "
+#
+# TODO: pick from and/or adapt one of the two following
+# examples to specify the source of the root filesystem:
+#
+# this example uses MTD and flash for the root filesystem
+pm -S $MALLOC "root=31:0 mtdparts=$TARGET:$ROOTDIR_SIZE@$ROOTDIR_OFFSET(root)ro "
+#
+# Example that tacks on video parameters
+# (for the CSB625's 640x480 display, in this case)
+# pm -S $MALLOC "video=pxafb:mode:640x480-16,active,left:1,right:161,hsynclen:1,upper:0,lower:31,vsynclen:32,hsync:0,vsync:0,outputen:1,pixclockpol:0,pixclock:25000 "
+#
+# Launch the kernel, pass it the command line
+#echo call $APPRAMBASE $MALLOC
+echo call 0xc0800000 $MALLOC $ARCH_ID
+call $APPRAMBASE $MALLOC $ARCH_ID
+exit
+#
+###############################################################################
+#
+# BOOTNFS:
+#
+###############################################################################
+#
+#
+if $NFSIP seq \$NFSIP gosub NORMAL_NFS 
+set NFSSERVER $NFSIP
+set NFSPATH $NFS_PATH
+goto NFS_BOOT
+
+# NORMAL_NFS:
+if $ARG2 sne \$ARG2 gosub SET_NFSSERVER
+if $NFSSERVER seq \$NFSSERVER goto NO_NFSSERVER
+#
+if $ARG3 sne \$ARG3 gosub SET_NFSPATH 
+if $NFSPATH seq \$NFSPATH goto NO_NFSPATH 
+goto NFS_BOOT
+#
+# SET_NFSSERVER:
+set NFSSERVER $ARG2
+return 
+#
+# SET_NFSPATH:
+set NFSPATH $ARG3
+return
+#
+#
+# NFS_BOOT:
+#
+# (note: -s creates a new string; -S appends to an existing string)
+# (note: the trailing spaces are so that appends work as expected)
+#
+pm -s $MALLOC "mem=32M console=ttySMX0,38400 "
+pm -S $MALLOC "ip=$IPADD:$NFSSERVER:$GIPADD:$NETMASK::eth0:off "
+#
+#
+# This example uses an NFS server for the root filesystem
+pm -S $MALLOC "root=0:0 nfsroot=$NFSSERVER:$NFSPATH rw "
+#
+# Example that tacks on video parameters
+# (for the CSB625's 640x480 display, in this case)
+# pm -S $MALLOC "video=pxafb:mode:640x480-16,active,left:1,right:161,hsynclen:1,upper:0,lower:31,vsynclen:32,hsync:0,vsync:0,outputen:1,pixclockpol:0,pixclock:25000 "
+#
+# Launch the kernel, pass it the combined command line
+echo call 0xc0800000 $MALLOC $ARCH_ID
+call $APPRAMBASE $MALLOC $ARCH_ID
+exit
+#
+###############################################################################
+#
+#
+# GET_KERNEL:
+# download kernel from TFTP server
+tftp $TFTPSERVER get /home/tftpboot/$KERNEL $APPRAMBASE
+if $TFTPGET seq \$TFTPGET goto NO_KERNEL
+#
+echo $KERNEL: size=$TFTPGET base=$APPRAMBASE
+goto GOT_KERNEL
+#
+###############################################################################
+#
+# Error Handling
+#
+###############################################################################
+#
+# NO_FILE:
+echo Cannot find filesystem: $ROOTDIR
+echo Abort.
+exit
+#
+# NO_KERNEL:
+echo Cannot find kernel file: $KERNEL
+echo Abort.
+exit
+#
+# NO_NFSSERVER:
+echo Cannot find NFS server, check your \$NFSSERVER variable
+echo "startlinux nfs <NFS-IP-ADDR> <NFS-PATH>"
+echo Example startlinux nfs 192.168.0.2 /usr/src/gxlinux/rootfs
+exit
+#
+# NO_NFSPATH:
+echo Cannot find NFS server path, check your \$NFSPATH variable
+echo "startlinux nfs <NFS-IP-ADDR> <NFS-PATH>"
+echo Example startlinux nfs 192.168.0.2 /usr/src/gxlinux/rootfs
+exit
+#
+###############################################################################
+#
+# End of File
+#
+###############################################################################
+
